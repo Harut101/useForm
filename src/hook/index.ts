@@ -8,7 +8,7 @@ function isEmpty(errors: Errors): boolean {
 
 const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
     const [, startTransition] = useTransition();
-    const [form, setFormFields] = useState({ ...schema.fields });
+    const [form, setForm] = useState({ ...schema.fields });
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [errors, setErrors] = useState<Errors>({});
 
@@ -47,7 +47,7 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
                 });
             }
             startTransition(() => {
-                setFormFields({ ...form, [name]: value });
+                setForm({ ...form, [name]: value });
             });
         },
         [form, submitted, errors, schema.validators]
@@ -68,7 +68,7 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
             }
             
             startTransition(() => {
-                setFormFields({ ...form, [name]: value });
+                setForm({ ...form, [name]: value });
             });
         },
         [form, submitted, errors, schema.validators]
@@ -82,12 +82,12 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
         (name = null) => {
             if (name) {
                 startTransition(() => {
-                    setFormFields({ ...form, [name]: schema.fields[name] });
+                    setForm({ ...form, [name]: schema.fields[name] });
                 });
                 
             } else {
                 startTransition(() => {
-                    setFormFields({ ...schema.fields });
+                    setForm({ ...schema.fields });
                 });
                
             }
