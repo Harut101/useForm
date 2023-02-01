@@ -1,0 +1,26 @@
+{
+    "presets": ["@babel/preset-env", "@babel/preset-react", "@babel/preset-flow"],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties",
+      [
+        "@babel/plugin-transform-runtime",
+        {
+          "regenerator": true
+        }
+      ],
+      "@babel/plugin-proposal-optional-chaining",
+      "@babel/plugin-transform-shorthand-properties"
+    ],
+    "env": {
+      "test": {
+        "plugins": [
+          [
+            "babel-plugin-webpack-alias",
+            {
+              "config": "./webpack.dev.config.js"
+            }
+          ]
+        ]
+      }
+    }
+  }
