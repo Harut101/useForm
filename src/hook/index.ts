@@ -21,11 +21,12 @@ function isEmpty(errors: Errors): boolean {
 }
 
 function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
-  const [, startTransition] = useTransition();
   const form = useRef({ ...schema.fields });
+  const fields = useRef<FieldRefsType>({});
+  const formState = useRef<Errors>({});
+  const [, startTransition] = useTransition();
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [errors, setErrors] = useState<Errors>({});
-  const fieldRefs = useRef<FieldRefsType>({});
 
   const onSubmit = useCallback(
     (e: SyntheticEvent) => {
@@ -38,6 +39,7 @@ function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
       if (isEmpty(errors)) {
         submitHandler(form.current);
       } else {
+        formState.current = errors;
         setErrors(errors);
       }
     },
@@ -56,11 +58,12 @@ function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
           { [name]: schema.validators[name] },
           value
         );
-        const errorsClone = { ...errors };
+        const errorsClone = { ...formState.current };
 
         if (isEmpty(validatedResult)) {
           delete errorsClone[name];
         }
+        formState.current = { ...errorsClone, ...validatedResult };
         startTransition(() => {
           setErrors({ ...errorsClone, ...validatedResult });
         });
@@ -68,53 +71,54 @@ function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
 
       form.current[name] = value;
     },
-    [submitted, errors, schema.validators, setErrors]
+    [submitted, schema.validators, setErrors]
   );
 
   const setValue = useCallback(
     (name: string, value: FieldType) => {
       if (submitted) {
-        const validated = validateForm(
+        const validatedResult = validateForm(
           form.current,
           { [name]: schema.validators[name] },
           value
         );
-        const errorsClone = { ...errors };
+        const errorsClone = { ...formState.current };
 
-        if (isEmpty(validated)) {
+        if (isEmpty(validatedResult)) {
           delete errorsClone[name];
         }
+        formState.current = { ...errorsClone, ...validatedResult };
         startTransition(() => {
-          setErrors({ ...errorsClone, ...validated });
+          setErrors({ ...errorsClone, ...validatedResult });
         });
       }
 
-      if (fieldRefs.current[name].current) {
-        fieldRefs.current[name].current.value = value;
+      if (fields.current[name].current) {
+        fields.current[name].current.value = value;
       }
 
       form.current[name] = value;
     },
-    [submitted, errors, schema.validators, setErrors]
+    [submitted, schema.validators, setErrors]
   );
 
   const getValue = useCallback((name: string) => form.current[name], []);
 
   const setError = useCallback(
     (name: string, message: string) =>
-      setErrors({ ...errors, [name]: message }),
-    [errors]
+      setErrors({ ...formState.current, [name]: message }),
+    []
   );
 
   const reset = useCallback(
     (name = null) => {
       if (name) {
         form.current[name] = schema.fields[name];
-        fieldRefs.current[name].current.value = schema.fields[name];
+        fields.current[name].current.value = schema.fields[name];
       } else {
         form.current = { ...schema.fields };
-        for (const refName in fieldRefs.current) {
-          fieldRefs.current[refName].current.value = schema.fields[refName];
+        for (const refName in fields.current) {
+          fields.current[refName].current.value = schema.fields[refName];
         }
       }
     },
@@ -125,7 +129,7 @@ function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
     if (isString(name)) {
       const fieldRef = useRef<HTMLInputElement>();
 
-      fieldRefs.current[name] = fieldRef;
+      fields.current[name] = fieldRef;
 
       return {
         name,
