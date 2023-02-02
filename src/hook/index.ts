@@ -127,13 +127,13 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
 
   const register = (name: string) => {
     if (isString(name)) {
-    //   const fieldRef = useRef<HTMLInputElement>();
+      const fieldRef = useRef<HTMLInputElement>();
 
-    //   fields.current[name] = fieldRef;
+      fields.current[name] = fieldRef;
 
       return {
         name,
-        // ref: fieldRef,
+        ref: fieldRef,
         onChange,
       };
     } else {
