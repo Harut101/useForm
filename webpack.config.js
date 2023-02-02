@@ -15,7 +15,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, "dist"),
     filename: "index.js",
-    publicPath: "auto",
+    libraryTarget: "commonjs2",
   },
   resolve: {
     extensions: [".ts", ".js"],
@@ -26,6 +26,9 @@ module.exports = {
     },
   },
   plugins: [new CleanWebpackPlugin()],
+  externals: {
+    react: "commonjs react",
+  },
   module: {
     rules: [
       {

@@ -20,7 +20,7 @@ function isEmpty(errors: Errors): boolean {
   return Object.keys(errors).length === 0;
 }
 
-function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
+export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
   const form = useRef({ ...schema.fields });
   const fields = useRef<FieldRefsType>({});
   const formState = useRef<Errors>({});
@@ -127,13 +127,13 @@ function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
 
   const register = (name: string) => {
     if (isString(name)) {
-      const fieldRef = useRef<HTMLInputElement>();
+    //   const fieldRef = useRef<HTMLInputElement>();
 
-      fields.current[name] = fieldRef;
+    //   fields.current[name] = fieldRef;
 
       return {
         name,
-        ref: fieldRef,
+        // ref: fieldRef,
         onChange,
       };
     } else {
@@ -151,6 +151,4 @@ function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
     setError,
     reset,
   };
-}
-
-export default useForm;
+} 

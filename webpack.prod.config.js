@@ -1,5 +1,6 @@
 const { merge } = require("webpack-merge");
 const TerserPlugin = require("terser-webpack-plugin");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const commonWebpackConfig = require("./webpack.config");
 
 const prodWebpackConfig = (_, arg) => {
@@ -17,6 +18,11 @@ const prodWebpackConfig = (_, arg) => {
             },
           },
         }),
+        new UglifyJsPlugin({
+          cache: true,
+          parallel: true,
+          sourceMap: false
+      }),
       ],
       splitChunks: false,
       runtimeChunk: false,
