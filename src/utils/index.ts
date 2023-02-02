@@ -1,2 +1,2 @@
-export * from './fieldValidators'
-export * from './formValidator'
+export * from "./fieldValidators";
+export * from "./formValidator";
