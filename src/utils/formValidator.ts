@@ -1,11 +1,11 @@
-import { Form, ValidatorsType, ValidatorFuncType, Errors, FieldType } from '@types';
+import { Form, ValidatorsType, ValidatorFuncType, Errors, FieldType, } from "@types";
 
-const validateForm = (form: Form, formValidators: ValidatorsType, value: FieldType = null) => {
+export function validateForm(form: Form, formValidators: ValidatorsType, value: FieldType = null) {
     const errors: Errors = {};
     for (const field in formValidators) {
         const fieldValidators: ValidatorFuncType[] = formValidators[field];
 
-         for (let i = 0; i < fieldValidators.length; i++) {
+        for (let i = 0; i < fieldValidators.length; i++) {
             const validate: ValidatorFuncType = fieldValidators[i];
             const processValue = value !== null ? value : form[field];
             let result = validate(processValue);
@@ -18,6 +18,4 @@ const validateForm = (form: Form, formValidators: ValidatorsType, value: FieldTy
     }
 
     return errors;
-};
-
-export default validateForm;
+}

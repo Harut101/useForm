@@ -1,8 +1,10 @@
-import { FieldType, ValidatedResultType, TestValidatorFuncType } from '@types';
+import { FieldType, ValidatedResultType, TestValidatorFuncType } from "@types";
 
-const isString = (str: FieldType): str is string => typeof str === "string";
+function isString(str: FieldType): str is string {
+    return typeof str === "string";
+}
 
-function number(message: string = "Value is invalid") {
+export function number(message: string = "Value is invalid") {
     return (value: string): ValidatedResultType => {
         const valid = /^\d*\.?\d*$/.test(value);
 
@@ -17,7 +19,7 @@ function number(message: string = "Value is invalid") {
     };
 }
 
-function integer(message: string = "Value is invalid") {
+export function integer(message: string = "Value is invalid") {
     return (value: string): ValidatedResultType => {
         const valid = /^\d+$/.test(value);
 
@@ -32,7 +34,7 @@ function integer(message: string = "Value is invalid") {
     };
 }
 
-function required(message: string = "This field is required.") {
+export function required(message: string = "This field is required.") {
     return (value: FieldType): ValidatedResultType => {
         const valid = isString(value) ? value.trim() !== "" : !!value;
 
@@ -47,7 +49,7 @@ function required(message: string = "This field is required.") {
     };
 }
 
-function min(minValue: string | number, message: string = "Value is invalid") {
+export function min(minValue: string | number, message: string = "Value is invalid") {
     return (value: string): ValidatedResultType => {
         const valid = value >= minValue;
 
@@ -62,7 +64,7 @@ function min(minValue: string | number, message: string = "Value is invalid") {
     };
 }
 
-function max(maxValue: string | number, message: string = "Value is invalid") {
+export function max(maxValue: string | number, message: string = "Value is invalid") {
     return (value: string): ValidatedResultType => {
         const valid = value <= maxValue;
 
@@ -77,7 +79,7 @@ function max(maxValue: string | number, message: string = "Value is invalid") {
     };
 }
 
-function minMax(minValue: string | number, maxValue: string | number, message: string = "Value is invalid") {
+export function minMax(minValue: string | number, maxValue: string | number, message: string = "Value is invalid") {
     return (value: string): ValidatedResultType => {
         const valid = value >= minValue && value <= maxValue;
 
@@ -92,7 +94,7 @@ function minMax(minValue: string | number, maxValue: string | number, message: s
     };
 }
 
-function test(validator: TestValidatorFuncType, message: string = "Value is invalid") {
+export function test(validator: TestValidatorFuncType, message: string = "Value is invalid") {
     return (value: FieldType): ValidatedResultType => {
         const valid = validator(value);
 
@@ -107,9 +109,11 @@ function test(validator: TestValidatorFuncType, message: string = "Value is inva
     };
 }
 
-function email(message: string = 'Value is invalid') {
+export function email(message: string = "Value is invalid") {
     return (value: string): ValidatedResultType => {
-        const valid = new RegExp(/^[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]+)*@[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]{2,20})+$/i).test(value);
+        const valid = new RegExp(
+            /^[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]+)*@[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]{2,20})+$/i
+        ).test(value);
 
         if (!valid) {
             return {
@@ -130,7 +134,7 @@ const validators = {
     minMax,
     test,
     integer,
-    email
+    email,
 };
 
 export default validators;

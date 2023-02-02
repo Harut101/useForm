@@ -1,16 +1,17 @@
-import { useState, useCallback, useTransition, SyntheticEvent, FormEvent } from "react";
-import { Errors, Schema, SubmitHandlerType, FieldType } from '@types';
-import validateForm from "../utils/formValidator";
+import { useState, useCallback, useTransition, useRef, SyntheticEvent, FormEvent, } from "react";
+import { Errors, Schema, SubmitHandlerType, FieldType, FieldRefsType, isString, } from "@types";
+import { validateForm } from "@utils";
 
 function isEmpty(errors: Errors): boolean {
     return Object.keys(errors).length === 0;
 }
 
-const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
+function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
     const [, startTransition] = useTransition();
     const [form, setForm] = useState({ ...schema.fields });
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [errors, setErrors] = useState<Errors>({});
+    const fieldRefs = useRef<FieldRefsType>({});
 
     const onSubmit = useCallback(
         (e: SyntheticEvent) => {
@@ -26,7 +27,7 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
                 setErrors(errors);
             }
         },
-        [form, submitHandler, setSubmitted, setErrors, schema.validators]
+        [form, schema.validators, submitHandler, setSubmitted, setErrors]
     );
 
     const onChange = useCallback(
@@ -50,7 +51,7 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
                 setForm({ ...form, [name]: value });
             });
         },
-        [form, submitted, errors, schema.validators]
+        [form, submitted, errors, schema.validators, setErrors, setForm]
     );
 
     const setValue = useCallback(
@@ -66,12 +67,16 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
                     setErrors({ ...errorsClone, ...validated });
                 });
             }
-            
+
+            if (fieldRefs.current[name].current) {
+                fieldRefs.current[name].current.value = value;
+            }
+
             startTransition(() => {
                 setForm({ ...form, [name]: value });
             });
         },
-        [form, submitted, errors, schema.validators]
+        [form, submitted, errors, schema.validators, setErrors, setForm]
     );
 
     const getValue = useCallback((name: string) => form[name], [form]);
@@ -84,23 +89,33 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
                 startTransition(() => {
                     setForm({ ...form, [name]: schema.fields[name] });
                 });
-                
+                fieldRefs.current[name].current.value = schema.fields[name];
             } else {
                 startTransition(() => {
                     setForm({ ...schema.fields });
                 });
-               
+                for (const refName in fieldRefs.current) {
+                    fieldRefs.current[refName].current.value = schema.fields[refName];
+                }
             }
         },
-        [form, schema.fields]
+        [form, schema.fields, setForm]
     );
 
     const register = (name: string) => {
-        return {
-            name,
-            value: getValue(name),
-            onChange,
-        };
+        if (isString(name)) {
+            const fieldRef = useRef<HTMLInputElement>();
+
+            fieldRefs.current[name] = fieldRef;
+
+            return {
+                name,
+                ref: fieldRef,
+                onChange,
+            };
+        } else {
+            throw Error("invalid name type");
+        }
     };
 
     return {
@@ -113,6 +128,6 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
         setError,
         reset,
     };
-};
+}
 
 export default useForm;
