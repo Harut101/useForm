@@ -49,10 +49,7 @@ export function required(message: string = "This field is required.") {
   };
 }
 
-export function min(
-  minValue: string | number,
-  message: string = "Value is invalid"
-) {
+export function min(minValue: string | number, message: string = "Value is invalid") {
   return (value: string): ValidatedResultType => {
     const valid = value >= minValue;
 
@@ -67,10 +64,7 @@ export function min(
   };
 }
 
-export function max(
-  maxValue: string | number,
-  message: string = "Value is invalid"
-) {
+export function max(maxValue: string | number, message: string = "Value is invalid") {
   return (value: string): ValidatedResultType => {
     const valid = value <= maxValue;
 
@@ -85,11 +79,7 @@ export function max(
   };
 }
 
-export function minMax(
-  minValue: string | number,
-  maxValue: string | number,
-  message: string = "Value is invalid"
-) {
+export function minMax(minValue: string | number, maxValue: string | number, message: string = "Value is invalid") {
   return (value: string): ValidatedResultType => {
     const valid = value >= minValue && value <= maxValue;
 
@@ -104,10 +94,7 @@ export function minMax(
   };
 }
 
-export function test(
-  validator: TestValidatorFuncType,
-  message: string = "Value is invalid"
-) {
+export function test(validator: TestValidatorFuncType, message: string = "Value is invalid") {
   return (value: FieldType): ValidatedResultType => {
     const valid = validator(value);
 
@@ -124,9 +111,7 @@ export function test(
 
 export function email(message: string = "Value is invalid") {
   return (value: string): ValidatedResultType => {
-    const valid = new RegExp(
-      /^[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]+)*@[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]{2,20})+$/i
-    ).test(value);
+    const valid = new RegExp(/^[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]+)*@[-!#-'*+/-9=?^-~]+(?:\.[-!#-'*+/-9=?^-~]{2,20})+$/i).test(value);
 
     if (!valid) {
       return {
