@@ -5,6 +5,7 @@ export type ValidatorFuncType = (value: FieldType) => ValidatedResultType;
 export type ValidatedResultType = { valid: boolean; message?: string };
 export type SubmitHandlerType = (form: Form) => void;
 export type TestValidatorFuncType = (value: FieldType) => boolean;
+export type StateType = 'value' | 'checked';
 
 export type FieldsType = {
   [key: string]: FieldType;

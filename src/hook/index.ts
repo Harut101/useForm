@@ -13,8 +13,10 @@ import {
   FieldType,
   FieldRefsType,
   isString,
+  StateType
 } from "@types";
 import { validateForm } from "@utils";
+import getField from '../utils/getField';
 
 function isEmpty(errors: Errors): boolean {
   return Object.keys(errors).length === 0;
@@ -75,7 +77,7 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
   );
 
   const setValue = useCallback(
-    (name: string, value: FieldType) => {
+    (name: string, value: FieldType, state: StateType = 'value') => {
       if (submitted) {
         const validatedResult = validateForm(
           form.current,
@@ -94,7 +96,10 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
       }
 
       if (fields.current[name].current) {
-        fields.current[name].current.value = value;
+        const node: HTMLInputElement | null = getField(name, fields.current[name].current);
+        if (node) {
+          (node as any)[state as keyof HTMLInputElement] = value;
+        }
       }
 
       form.current[name] = value;
