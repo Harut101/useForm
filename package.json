@@ -1,6 +1,6 @@
 {
   "name": "use-formula",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "hook for validation and submit form",
   "main": "./dist/index.js",
   "scripts": {
