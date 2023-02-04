@@ -60,14 +60,14 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
   const setValue = useCallback(
     (name: string, value: FieldType, state: StateType = "value") => {
 
-      if (fields.current && fields.current[name].current) {
+      if (fields.current && fields.current[name]?.current) {
         const node: HTMLInputElement | null = getField(name, fields.current[name].current);
         if (node) {
           (node as any)[state as keyof HTMLInputElement] = value;
         }
         form.current[name] = value;
       } else {
-        throw Error("Field is not initialized");
+        console.error("Field is not initialized");
       }
 
       if (submitted) {
@@ -123,7 +123,7 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
         onChange,
       };
     } else {
-      throw Error("invalid name type");
+      console.error("invalid name type");
     }
   };
 
