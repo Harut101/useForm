@@ -59,6 +59,17 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
 
   const setValue = useCallback(
     (name: string, value: FieldType, state: StateType = "value") => {
+
+      if (fields.current && fields.current[name].current) {
+        const node: HTMLInputElement | null = getField(name, fields.current[name].current);
+        if (node) {
+          (node as any)[state as keyof HTMLInputElement] = value;
+        }
+        form.current[name] = value;
+      } else {
+        throw Error("Field is not initialized");
+      }
+
       if (submitted) {
         const validatedResult = validateForm(form.current, { [name]: schema.validators[name] }, value);
         const errorsClone = { ...formState.current };
@@ -71,15 +82,6 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
           setErrors({ ...errorsClone, ...validatedResult });
         });
       }
-
-      if (fields.current[name].current) {
-        const node: HTMLInputElement | null = getField(name, fields.current[name].current);
-        if (node) {
-          (node as any)[state as keyof HTMLInputElement] = value;
-        }
-      }
-
-      form.current[name] = value;
     },
     [submitted, schema.validators, setErrors]
   );
