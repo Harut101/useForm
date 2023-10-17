@@ -3,10 +3,9 @@ import { FieldElement, FieldValueType } from "@types";
 
 export const setFieldValue = (field: FieldElement, value: FieldValueType) => {
   if (isCheckboxInput(field) || isRadioInput(field)) {
-    (field as HTMLInputElement).checked = value as boolean;
+    field.checked = !!value;
   } else if (isSelect(field)) {
-    const selectElement = field as HTMLSelectElement;
-    for (let option of selectElement.options) {
+    for (let option of field.options) {
       if (option.value === value) {
         option.selected = true;
         break;
