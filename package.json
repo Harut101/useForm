@@ -1,37 +1,9 @@
 {
-  "name": "use-formula",
-  "version": "1.0.5",
-  "description": "hook for validation and submit form",
+  "name": "hook-form",
+  "version": "1.0.0",
+  "description": "form hook for handle form validation submit ect...",
   "main": "./dist/index.js",
-  "scripts": {
-    "dev": "webpack-dev-server --open --config webpack.dev.config.js --live-reload --hot",
-    "build:dev": "webpack --config webpack.dev.config.js",
-    "build:prod": "set NODE_OPTIONS=--openssl-legacy-provider && webpack --config webpack.prod.config.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Harut101/useForm.git"
-  },
-  "keywords": [
-    "react",
-    "useForm",
-    "form",
-    "validation"
-  ],
-  "author": "Harut",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Harut101/useForm/issues"
-  },
-  "homepage": "https://github.com/Harut101/useForm#readme",
-  "peerDependencies": {
-    "react": "^18.2.0"
-  },
   "dependencies": {
-    "react": "^18.2.0",
-    "typescript": "^4.9.5"
-  },
-  "devDependencies": {
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
     "@babel/plugin-proposal-optional-chaining": "^7.20.7",
@@ -50,5 +22,27 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
     "webpack-merge": "^5.8.0"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "webpack-dev-server --open --config webpack.dev.config.js --live-reload --hot",
+    "build:dev": "webpack --config webpack.dev.config.js",
+    "build:prod": "set NODE_OPTIONS=--openssl-legacy-provider && webpack --config webpack.prod.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Harut101/useForm.git"
+  },
+  "keywords": [
+    "useForm",
+    "hook",
+    "form",
+    "react"
+  ],
+  "author": "Harut",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Harut101/useForm/issues"
+  },
+  "homepage": "https://github.com/Harut101/useForm#readme"
 }
