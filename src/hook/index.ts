@@ -6,7 +6,7 @@ function isEmpty(obj: Errors) {
   return Object.keys(obj).length === 0;
 }
 
-const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
+export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
   const [formFields] = useState({ ...schema.fields });
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
@@ -104,5 +104,3 @@ const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
     reset,
   };
 };
-
-export default useForm;
