@@ -1,2 +1,3 @@
 export * from './types';
-export * from './typeGuards';
+export * from './type-guards';
+export * from './field-types';

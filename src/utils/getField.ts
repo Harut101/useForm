@@ -1,21 +1,5 @@
-const cache = new Map();
+import { isUndefined } from "@utils";
+import { FieldElement } from "@types";
 
-export default function getField(name: string, field: HTMLElement): HTMLInputElement | null {
-  if (cache.has(name)) {
-    return cache.get(name);
-  }
-
-  if (field.nodeName === "INPUT" || field.nodeName === "TEXTAREA") {
-    cache.set(name, field);
-    return field as HTMLInputElement;
-  }
-
-  const input = field.querySelector(`[name=${name}]`);
-  const textField = input instanceof HTMLInputElement ? input : null;
-
-  if (textField) {
-    cache.set(name, textField);
-  }
-
-  return textField;
-}
+export const getField = (_ref: FieldElement) =>
+  isUndefined(_ref?.value) ? (_ref?.querySelectorAll ? _ref?.querySelectorAll("input,select,textarea")[0] || _ref : _ref) : _ref;

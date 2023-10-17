@@ -1,19 +1,16 @@
-import { useState, useCallback, useTransition, useRef, SyntheticEvent, FormEvent } from "react";
-import { Errors, Schema, SubmitHandlerType, FieldType, FieldRefsType, isString, StateType } from "@types";
-import { validateForm } from "@utils";
-import getField from "../utils/getField";
+import { useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
+import { validateForm, getField, setFieldValue, isCheckboxInput } from "@utils";
+import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement } from "@types";
 
-function isEmpty(errors: Errors): boolean {
-  return Object.keys(errors).length === 0;
+function isEmpty(obj: Errors) {
+  return Object.keys(obj).length === 0;
 }
 
-export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
+const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
+  const [formFields] = useState({ ...schema.fields });
+  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState({});
   const form = useRef({ ...schema.fields });
-  const fields = useRef<FieldRefsType>({});
-  const formState = useRef<Errors>({});
-  const [, startTransition] = useTransition();
-  const [submitted, setSubmitted] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Errors>({});
 
   const onSubmit = useCallback(
     (e: SyntheticEvent) => {
@@ -23,109 +20,78 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
 
       let errors = validateForm(form.current, schema.validators);
 
+      setErrors(errors);
+
       if (isEmpty(errors)) {
         submitHandler(form.current);
-      } else {
-        formState.current = errors;
-        setErrors(errors);
       }
     },
-    [schema.validators, submitHandler, setSubmitted, setErrors]
+    [submitHandler, schema.validators]
   );
 
-  const onChange = useCallback(
-    (e: FormEvent<HTMLInputElement>) => {
-      e.preventDefault();
-
-      const { name, value } = e.currentTarget;
-
+  const handleChange = useCallback(
+    (name: FieldName, value: FieldValueType) => {
       if (submitted) {
-        const validatedResult = validateForm(form.current, { [name]: schema.validators[name] }, value);
-        const errorsClone = { ...formState.current };
+        const validated = validateForm(form.current, { [name]: schema.validators[name] }, value);
 
-        if (isEmpty(validatedResult)) {
-          delete errorsClone[name];
-        }
-        formState.current = { ...errorsClone, ...validatedResult };
-        startTransition(() => {
-          setErrors({ ...errorsClone, ...validatedResult });
+        setErrors((errors) => {
+          const errorClone = { ...errors } as Errors;
+
+          if (isEmpty(validated)) delete errorClone[name];
+
+          return { ...errorClone, ...validated };
         });
       }
 
       form.current[name] = value;
     },
-    [submitted, schema.validators, setErrors]
+    [submitted, schema.validators]
   );
 
-  const setValue = useCallback(
-    (name: string, value: FieldType, state: StateType = "value") => {
+  const setValue = useCallback((name: FieldName, value: FieldValueType) => {
+    form.current[name] = value;
+  }, []);
 
-      if (fields.current && fields.current[name]?.current) {
-        const node: HTMLInputElement | null = getField(name, fields.current[name].current);
-        if (node) {
-          (node as any)[state as keyof HTMLInputElement] = value;
-        }
-        form.current[name] = value;
-      } else {
-        console.error("Field is not initialized");
-      }
+  const getValue = useCallback((name: FieldName) => form.current[name], []);
 
-      if (submitted) {
-        const validatedResult = validateForm(form.current, { [name]: schema.validators[name] }, value);
-        const errorsClone = { ...formState.current };
-
-        if (isEmpty(validatedResult)) {
-          delete errorsClone[name];
-        }
-        formState.current = { ...errorsClone, ...validatedResult };
-        startTransition(() => {
-          setErrors({ ...errorsClone, ...validatedResult });
-        });
-      }
-    },
-    [submitted, schema.validators, setErrors]
-  );
-
-  const getValue = useCallback((name: string) => form.current[name], []);
-
-  const setError = useCallback((name: string, message: string) => setErrors({ ...formState.current, [name]: message }), []);
+  const setError = useCallback((name: FieldName, message: string) => setErrors({ ...errors, [name]: message }), [errors]);
 
   const reset = useCallback(
     (name = null) => {
       if (name) {
-        form.current[name] = schema.fields[name];
-        const node: HTMLInputElement | null = getField(name, fields.current[name].current);
-        if (node) {
-          (node as any)["value" as keyof HTMLInputElement] = schema.fields[name];
-        }
+        form.current[name] = formFields[name];
       } else {
-        form.current = { ...schema.fields };
-        for (const refName in fields.current) {
-          const node: HTMLInputElement | null = getField(refName, fields.current[refName].current);
-          if (node) {
-            (node as any)["value" as keyof HTMLInputElement] = schema.fields[refName];
-          }
-        }
+        form.current = { ...formFields };
       }
     },
-    [schema.fields]
+    [formFields]
   );
 
-  const register = (name: string) => {
-    if (isString(name)) {
-      const fieldRef = useRef<HTMLInputElement>();
-
-      fields.current[name] = fieldRef;
-
-      return {
+  const register = useCallback(
+    (name: FieldName) => {
+      const fieldObj = {
         name,
-        ref: fieldRef,
-        onChange,
+        ref: (_ref: FieldElement) => {
+          const field = getField(_ref) as FieldElement;
+
+          if (field) {
+            setFieldValue(field, form.current[name]);
+          }
+        },
+        onChange: (event: ChangeEvent<FieldElement>) => {
+          event.preventDefault();
+          const field = getField(event.target) as FieldElement;
+
+          const prop = isCheckboxInput(field) ? "checked" : "value";
+
+          handleChange(name, (event.target as HTMLInputElement)[prop]);
+        },
       };
-    } else {
-      console.error("invalid name type");
-    }
-  };
+
+      return fieldObj;
+    },
+    [form, handleChange]
+  );
 
   return {
     errors,
@@ -137,4 +103,6 @@ export function useForm(schema: Schema, submitHandler: SubmitHandlerType) {
     setError,
     reset,
   };
-}
+};
+
+export default useForm;

@@ -1,6 +1,6 @@
-import { Form, ValidatorsType, ValidatorFuncType, Errors, FieldType } from "@types";
+import { Form, ValidatorsType, ValidatorFuncType, Errors, FieldValueType } from "@types";
 
-export function validateForm(form: Form, formValidators: ValidatorsType, value: FieldType = null) {
+export function validateForm(form: Form, formValidators: ValidatorsType, value: FieldValueType = null) {
   const errors: Errors = {};
   for (const field in formValidators) {
     const fieldValidators: ValidatorFuncType[] = formValidators[field];

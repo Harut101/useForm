@@ -1,0 +1,5 @@
+import { FieldElement } from "@types";
+
+export const isRadioInput = (element: FieldElement): element is HTMLInputElement => element.type === "radio";
+export const isCheckboxInput = (element: FieldElement): element is HTMLInputElement => element.type === "checkbox";
+export const isSelect = (element: FieldElement): element is HTMLInputElement => element.tagName.toLowerCase() === "select";

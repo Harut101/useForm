@@ -1,6 +1,6 @@
-import { FieldType, ValidatedResultType, TestValidatorFuncType } from "@types";
+import { FieldValueType, ValidatedResultType, TestValidatorFuncType } from "@types";
 
-function isString(str: FieldType): str is string {
+function isString(str: FieldValueType): str is string {
   return typeof str === "string";
 }
 
@@ -35,7 +35,7 @@ export function integer(message: string = "Value is invalid") {
 }
 
 export function required(message: string = "This field is required.") {
-  return (value: FieldType): ValidatedResultType => {
+  return (value: FieldValueType): ValidatedResultType => {
     const valid = isString(value) ? value.trim() !== "" : !!value;
 
     if (!valid) {
@@ -95,7 +95,7 @@ export function minMax(minValue: string | number, maxValue: string | number, mes
 }
 
 export function test(validator: TestValidatorFuncType, message: string = "Value is invalid") {
-  return (value: FieldType): ValidatedResultType => {
+  return (value: FieldValueType): ValidatedResultType => {
     const valid = validator(value);
 
     if (!valid) {
