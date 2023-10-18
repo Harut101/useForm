@@ -12,6 +12,21 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
   const [errors, setErrors] = useState({});
   const form = useRef({ ...schema.fields });
 
+  const validate = useCallback(
+    (name: FieldName, value: FieldValueType) => {
+      const validated = validateForm(form.current, { [name]: schema.validators[name] }, value);
+
+      setErrors((errors) => {
+        const errorClone = { ...errors } as Errors;
+
+        if (isEmpty(validated)) delete errorClone[name];
+
+        return { ...errorClone, ...validated };
+      });
+    },
+    [schema.validators]
+  );
+
   const onSubmit = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault();
@@ -32,25 +47,23 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
   const handleChange = useCallback(
     (name: FieldName, value: FieldValueType) => {
       if (submitted) {
-        const validated = validateForm(form.current, { [name]: schema.validators[name] }, value);
-
-        setErrors((errors) => {
-          const errorClone = { ...errors } as Errors;
-
-          if (isEmpty(validated)) delete errorClone[name];
-
-          return { ...errorClone, ...validated };
-        });
+        validate(name, value);
       }
 
       form.current[name] = value;
     },
-    [submitted, schema.validators]
+    [submitted, schema.validators, validate]
   );
 
-  const setValue = useCallback((name: FieldName, value: FieldValueType) => {
-    form.current[name] = value;
-  }, []);
+  const setValue = useCallback(
+    (name: FieldName, value: FieldValueType) => {
+      if (submitted) {
+        validate(name, value);
+      }
+      form.current[name] = value;
+    },
+    [submitted, validate]
+  );
 
   const getValue = useCallback((name: FieldName) => form.current[name], []);
 
