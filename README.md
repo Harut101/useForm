@@ -39,7 +39,7 @@ const schema = {
   },
   validators: {
     // Define your validation rules here
-    email: [fieldValidators.required(), fieldValidators.email("invalid email")}
+    email: [fieldValidators.required(), fieldValidators.email("invalid email")]
   },
 };
 
