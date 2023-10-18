@@ -92,7 +92,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
           }
         },
         onChange: (event: ChangeEvent<FieldElement>) => {
-          event.preventDefault();
+          event.stopPropagation();
           const field = getField(event.target) as FieldElement;
 
           const prop = isCheckboxInput(field) ? "checked" : "value";
