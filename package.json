@@ -1,6 +1,6 @@
 {
   "name": "morf-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "form hook for handle form validation submit ect...",
   "main": "./dist/index.js",
   "peerDependencies": {
