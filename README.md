@@ -73,20 +73,20 @@ In this example, you define your form schema and validation rules, initialize th
 
 # Functions and Values
 
-errors: An object that holds validation errors for form fields.
+`errors`: An object that holds validation errors for form fields.
 
-submitted: A boolean value indicating whether the form has been submitted.
+`submitted`: A boolean value indicating whether the form has been submitted.
 
-register: A function to register form fields and their associated events (e.g., onChange).
+`register`: A function to register form fields and their associated events (e.g., onChange).
 
-onSubmit: A function to handle form submission, including validation.
+`onSubmit`: A function to handle form submission, including validation.
 
-setValue: A function to set the value of a form field programmatically.
+`setValue`: A function to set the value of a form field programmatically.
 
-getValue: A function to retrieve the current value of a form field.
+`getValue`: A function to retrieve the current value of a form field.
 
-setError: A function to set an error message for a specific form field.
+`setError`: A function to set an error message for a specific form field.
 
-reset: A function to reset form fields to their initial values. You can optionally specify a field name to reset only a specific field.
+`reset`: A function to reset form fields to their initial values. You can optionally specify a field name to reset only a specific field.
 
 Happy form handling!
