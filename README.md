@@ -17,13 +17,13 @@ Performance Optimization: The hook is designed to minimize re-renders by updatin
 You can install useForm using npm or yarn:
 
 ```sh
-  npm install morf-manager
+  npm install form-manager-hook
 ```
 
 or
 
 ```sh
-  yarn add morf-manager
+  yarn add form-manager-hook
 ```
 
 # Usage
@@ -31,7 +31,7 @@ or
 ```javascript
 import React from "react";
 // Import the useForm hook
-import useForm, { required, email } from "morf-manager";
+import useForm, { required, email } from "form-manager-hook";
 
 // Define your form schema
 const schema = {
