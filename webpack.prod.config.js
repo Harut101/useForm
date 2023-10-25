@@ -24,7 +24,10 @@ const prodWebpackConfig = (_, arg) => {
     },
     plugins: [
       new CopyWebpackPlugin({
-        patterns: [{ from: "package.json", to: "." }],
+        patterns: [
+          { from: "package.json", to: "." },
+          { from: "README.md", to: "." },
+        ],
       }),
     ],
   });
