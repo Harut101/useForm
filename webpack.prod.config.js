@@ -1,7 +1,7 @@
 const { merge } = require("webpack-merge");
 const TerserPlugin = require("terser-webpack-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const commonWebpackConfig = require("./webpack.config");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const prodWebpackConfig = (_, arg) => {
   return merge(commonWebpackConfig, {
@@ -18,15 +18,15 @@ const prodWebpackConfig = (_, arg) => {
             },
           },
         }),
-        new UglifyJsPlugin({
-          cache: true,
-          parallel: true,
-          sourceMap: false
-      }),
       ],
       splitChunks: false,
       runtimeChunk: false,
     },
+    plugins: [
+      new CopyWebpackPlugin({
+        patterns: [{ from: "package.json", to: "." }],
+      }),
+    ],
   });
 };
 
