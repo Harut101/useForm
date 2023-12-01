@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
 import { validateForm, getField, setFieldValue, isCheckboxInput } from "@utils";
-import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement } from "@types";
+import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement } from "form-manager-hook";
 
 function isEmpty(obj: Errors) {
   return Object.keys(obj).length === 0;

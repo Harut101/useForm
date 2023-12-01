@@ -1,4 +1,4 @@
-import { Form, ValidatorsType, ValidatorFuncType, Errors, FieldValueType } from "@types";
+import { Form, ValidatorsType, ValidatorFuncType, Errors, FieldValueType } from "form-manager-hook";
 
 export function validateForm(form: Form, formValidators: ValidatorsType, value: FieldValueType = null) {
   const errors: Errors = {};
