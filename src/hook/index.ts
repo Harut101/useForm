@@ -1,20 +1,26 @@
 import { useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
-import { validateForm, getField, setFieldValue, isCheckboxInput } from "@utils";
-import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement } from "form-manager-hook";
+import { validateForm, getField, setFieldValue, isCheckboxInput, isEmpty } from "@utils";
+import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption, Mode } from "form-manager-hook";
 
-function isEmpty(obj: Errors) {
-  return Object.keys(obj).length === 0;
-}
+const defaultConfigOption = {
+  mode: Mode.uncontrolled,
+  updateBackupForm: false,
+};
 
-export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
-  const [formFields] = useState({ ...schema.fields });
+export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, configOption: ConfigOption = {}) => {
+  const backUpForm = useRef({ ...schema.fields });
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isDraft, setIsDraft] = useState(false);
+  const [controlledForm, setControlledForm] = useState({ ...schema.fields });
   const form = useRef({ ...schema.fields });
+
+  const option = { ...defaultConfigOption, ...configOption };
 
   const validate = useCallback(
     (name: FieldName, value: FieldValueType) => {
-      const validated = validateForm(form.current, { [name]: schema.validators[name] }, value);
+      const formToValidate = option.mode === Mode.controlled ? controlledForm : form.current;
+      const validated = validateForm(formToValidate, { [name]: schema.validators[name] }, value);
 
       setErrors((errors) => {
         const errorClone = { ...errors } as Errors;
@@ -24,7 +30,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
         return { ...errorClone, ...validated };
       });
     },
-    [schema.validators]
+    [schema.validators, controlledForm, option]
   );
 
   const onSubmit = useCallback(
@@ -33,51 +39,77 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
 
       setSubmitted(true);
 
-      let errors = validateForm(form.current, schema.validators);
+      const formToValidate = option.mode === Mode.controlled ? controlledForm : form.current;
+
+      const errors = validateForm(formToValidate, schema.validators);
 
       setErrors(errors);
 
       if (isEmpty(errors)) {
-        submitHandler(form.current);
+        submitHandler(formToValidate);
+        setIsDraft(false);
+        if (option.updateBackupForm) backUpForm.current = formToValidate;
       }
     },
-    [submitHandler, schema.validators]
+    [submitHandler, schema.validators, controlledForm, option]
   );
+
+  const assignValue = useCallback((name: FieldName, value: FieldValueType, mode: Mode) => {
+    if (mode === Mode.controlled) {
+      setControlledForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    } else {
+      form.current[name] = value;
+    }
+    setIsDraft(true);
+  }, []);
 
   const handleChange = useCallback(
     (name: FieldName, value: FieldValueType) => {
-      if (submitted) {
-        validate(name, value);
-      }
+      if (submitted) validate(name, value);
 
-      form.current[name] = value;
+      assignValue(name, value, option.mode);
     },
-    [submitted, schema.validators, validate]
+    [submitted, schema.validators, option, assignValue, validate]
   );
 
   const setValue = useCallback(
     (name: FieldName, value: FieldValueType) => {
-      if (submitted) {
-        validate(name, value);
-      }
-      form.current[name] = value;
+      if (submitted) validate(name, value);
+
+      assignValue(name, value, option.mode);
     },
-    [submitted, validate]
+    [submitted, option, assignValue, validate]
   );
 
-  const getValue = useCallback((name: FieldName) => form.current[name], []);
+  const getValue = useCallback(
+    (name: FieldName) => (option.mode === Mode.controlled ? controlledForm[name] : form.current[name]),
+    [option]
+  );
 
   const setError = useCallback((name: FieldName, message: string) => setErrors({ ...errors, [name]: message }), [errors]);
 
   const reset = useCallback(
     (name = null) => {
+      const { mode } = option;
+
       if (name) {
-        form.current[name] = formFields[name];
+        if (mode === Mode.controlled) {
+          setControlledForm((prev) => ({ ...prev, [name]: backUpForm.current[name] }));
+        } else {
+          form.current[name] = backUpForm.current[name];
+        }
       } else {
-        form.current = { ...formFields };
+        if (mode === Mode.controlled) {
+          setControlledForm({ ...backUpForm.current });
+        } else {
+          form.current = { ...backUpForm.current };
+        }
       }
     },
-    [formFields]
+    [option]
   );
 
   const register = useCallback(
@@ -107,8 +139,10 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType) => {
   );
 
   return {
+    form: controlledForm,
     errors,
     submitted,
+    isDraft,
     register,
     onSubmit,
     setValue,

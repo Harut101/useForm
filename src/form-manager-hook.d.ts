@@ -1,6 +1,8 @@
 declare module "form-manager-hook" {
   import { MutableRefObject } from "react";
 
+  export type FieldName = string;
+  export type FieldElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
   export type FieldValueType = string | number | object | boolean | null | undefined;
   export type ValidatorFuncType = (value: FieldValueType) => ValidatedResultType;
   export type ValidatedResultType = { valid: boolean; message?: string };
@@ -8,17 +10,27 @@ declare module "form-manager-hook" {
   export type TestValidatorFuncType = (value: FieldValueType) => boolean;
   export type StateType = "value" | "checked";
 
-  export type FieldsType = {
-    [key: string]: FieldValueType;
-  };
+  export enum Mode {
+    controlled = "controlled",
+    uncontrolled = "uncontrolled",
+  }
 
-  export type ValidatorsType = {
+  export interface ConfigOption {
+    mode?: Mode;
+    updateBackupForm?: boolean;
+  }
+
+  export interface FieldsType {
+    [key: string]: FieldValueType;
+  }
+
+  export interface ValidatorsType {
     [key: string]: ValidatorFuncType[] | [];
-  };
+  }
 
-  export type Form = {
+  export interface Form {
     [key: string]: FieldValueType;
-  };
+  }
 
   export interface FieldRefsType {
     [key: string]: MutableRefObject<any>;
@@ -35,7 +47,4 @@ declare module "form-manager-hook" {
   export interface Errors {
     [key: string]: string | undefined;
   }
-
-  export type FieldName = string;
-  export type FieldElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 }
