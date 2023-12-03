@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
+import { useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
 import { validateForm, getField, setFieldValue, isCheckboxInput, isEmpty } from "@utils";
 import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption, Mode } from "form-manager-hook";
 
@@ -6,8 +6,6 @@ const defaultConfigOption = {
   mode: "uncontrolled",
   updateBackupForm: false,
 };
-
-const fieldsNodeMap = new Map();
 
 export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, configOption: ConfigOption = {}) => {
   const backUpForm = useRef({ ...schema.fields });
@@ -18,10 +16,6 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
   const form = useRef({ ...schema.fields });
 
   const option = { ...defaultConfigOption, ...configOption };
-
-  useEffect(() => {
-    return () => fieldsNodeMap.clear();
-  }, []);
 
   const validate = useCallback(
     (name: FieldName, value: FieldValueType) => {
@@ -120,9 +114,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
       const fieldObj = {
         name,
         ref: (_ref: FieldElement) => {
-          if (!fieldsNodeMap.has(name)) fieldsNodeMap.set(name, getField(_ref) as FieldElement);
-
-          const field = fieldsNodeMap.get(name);
+          const field = getField(_ref) as FieldElement;
 
           if (field && option.mode === "uncontrolled") {
             setFieldValue(field, form.current[name]);
@@ -130,9 +122,8 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
         },
         onChange: (event: ChangeEvent<FieldElement>) => {
           event.stopPropagation();
-          if (!fieldsNodeMap.has(name)) fieldsNodeMap.set(name, getField(event.target) as FieldElement);
 
-          const field = fieldsNodeMap.get(name);
+          const field = getField(event.target) as FieldElement;
 
           const prop = isCheckboxInput(field) ? "checked" : "value";
 
