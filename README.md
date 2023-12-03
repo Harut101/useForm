@@ -47,7 +47,7 @@ const schema = {
 
 const MyForm = () => {
   // Initialize the useForm hook
-  const { errors, register, onSubmit } = useForm(schema, handleSubmit);
+  const { errors, register, onSubmit } = useForm(schema, handleSubmit); // useForm(schema, handleSubmit, {mode: "controlled"})
 
   const handleSubmit = (formData) => {
     // Handle form submission here
@@ -88,6 +88,16 @@ In this example, you define your form schema and validation rules, initialize th
 
 `reset`: A function to reset form fields to their initial values. You can optionally specify a field name to reset only a specific field.
 
+`isDraft`
+- **Type:** `boolean`
+- **Default:** `false`
+
+  `isDraft` is a boolean state variable provided by the `useForm` hook. Its purpose is to indicate whether the form is in a draft state, meaning that there are unsaved changes. By default, `isDraft` is set to `false`.
+
+  - When a user interacts with the form fields, such as typing in input boxes, `isDraft` automatically switches to `true` to signify that there are pending changes.
+
+  - After submitting the form successfully (assuming there are no validation errors), `isDraft` is set back to `false`. You can use this state to prompt the user to save changes before leaving the page or to provide visual feedback about the form's current state.
+
 # Validator Functions
 
 `number`:
@@ -121,5 +131,18 @@ In this example, you define your form schema and validation rules, initialize th
 `email`:
 
 - Parameters: (message: string = "Value is invalid")
+
+# Config Option
+
+`mode`
+
+- **Value:** (`controlled` | `uncontrolled`), default is `uncontrolled`.
+  - Choose between making your form fields controlled or uncontrolled. By default, they are uncontrolled.
+  - If you set `mode` to `controlled` when using `useForm`, it will return a `form` variable with all fields. You can then use this variable as the value for your form inputs.
+
+`updateBackupForm`
+
+- **Value:** (`true` | `false`), default is `false`.
+  - When you set `updateBackupForm` to `true`, after submitting the form, your backup will be updated with the submitted form data. This allows you to reset the form using `reset` from `useForm`, effectively reverting the form to its latest state.
 
 # Happy form handling!
