@@ -1,6 +1,6 @@
 {
   "name": "form-manager-hook",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "form hook for handle form validation submit ect...",
   "main": "index.js",
   "peerDependencies": {
