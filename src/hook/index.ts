@@ -3,7 +3,7 @@ import { validateForm, getField, setFieldValue, isCheckboxInput, isEmpty } from 
 import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption, Mode } from "form-manager-hook";
 
 const defaultConfigOption = {
-  mode: Mode.uncontrolled,
+  mode: "uncontrolled",
   updateBackupForm: false,
 };
 
@@ -19,7 +19,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
 
   const validate = useCallback(
     (name: FieldName, value: FieldValueType) => {
-      const formToValidate = option.mode === Mode.controlled ? controlledForm : form.current;
+      const formToValidate = option.mode === "controlled" ? controlledForm : form.current;
       const validated = validateForm(formToValidate, { [name]: schema.validators[name] }, value);
 
       setErrors((errors) => {
@@ -39,7 +39,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
 
       setSubmitted(true);
 
-      const formToValidate = option.mode === Mode.controlled ? controlledForm : form.current;
+      const formToValidate = option.mode === "controlled" ? controlledForm : form.current;
 
       const errors = validateForm(formToValidate, schema.validators);
 
@@ -54,8 +54,8 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
     [submitHandler, schema.validators, controlledForm, option]
   );
 
-  const assignValue = useCallback((name: FieldName, value: FieldValueType, mode: Mode) => {
-    if (mode === Mode.controlled) {
+  const assignValue = useCallback((name: FieldName, value: FieldValueType, mode: string) => {
+    if (mode === "controlled") {
       setControlledForm((prev) => ({
         ...prev,
         [name]: value,
@@ -84,10 +84,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
     [submitted, option, assignValue, validate]
   );
 
-  const getValue = useCallback(
-    (name: FieldName) => (option.mode === Mode.controlled ? controlledForm[name] : form.current[name]),
-    [option]
-  );
+  const getValue = useCallback((name: FieldName) => (option.mode === "controlled" ? controlledForm[name] : form.current[name]), [option]);
 
   const setError = useCallback((name: FieldName, message: string) => setErrors({ ...errors, [name]: message }), [errors]);
 
@@ -96,13 +93,13 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
       const { mode } = option;
 
       if (name) {
-        if (mode === Mode.controlled) {
+        if (mode === "controlled") {
           setControlledForm((prev) => ({ ...prev, [name]: backUpForm.current[name] }));
         } else {
           form.current[name] = backUpForm.current[name];
         }
       } else {
-        if (mode === Mode.controlled) {
+        if (mode === "controlled") {
           setControlledForm({ ...backUpForm.current });
         } else {
           form.current = { ...backUpForm.current };

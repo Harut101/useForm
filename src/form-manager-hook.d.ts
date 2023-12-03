@@ -10,10 +10,7 @@ declare module "form-manager-hook" {
   export type TestValidatorFuncType = (value: FieldValueType) => boolean;
   export type StateType = "value" | "checked";
 
-  export enum Mode {
-    controlled = "controlled",
-    uncontrolled = "uncontrolled",
-  }
+  export type Mode = "controlled" | "uncontrolled";
 
   export interface ConfigOption {
     mode?: Mode;
