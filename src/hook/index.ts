@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
+import { useEffect, useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
 import { validateForm, getField, setFieldValue, isCheckboxInput, isEmpty } from "@utils";
-import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption, Mode } from "form-manager-hook";
+import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption } from "form-manager-hook";
 
 const defaultConfigOption = {
   mode: "uncontrolled",
@@ -14,8 +14,15 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
   const [isDraft, setIsDraft] = useState(false);
   const [controlledForm, setControlledForm] = useState({ ...schema.fields });
   const form = useRef({ ...schema.fields });
+  const timer = useRef<NodeJS.Timeout | null>(null);
 
   const option = { ...defaultConfigOption, ...configOption };
+
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
 
   const validate = useCallback(
     (name: FieldName, value: FieldValueType) => {
@@ -47,7 +54,9 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
 
       if (isEmpty(errors)) {
         submitHandler(formToValidate);
-        setIsDraft(false);
+
+        timer.current = setTimeout(() => setIsDraft(false), 300);
+
         if (option.updateBackupForm) backUpForm.current = formToValidate;
       }
     },
@@ -91,6 +100,8 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
   const reset = useCallback(
     (name = null) => {
       const { mode } = option;
+
+      setIsDraft(false);
 
       if (name) {
         if (mode === "controlled") {

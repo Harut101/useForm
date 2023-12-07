@@ -5,7 +5,7 @@ export function validateForm(form: Form, formValidators: ValidatorsType, value: 
   for (const field in formValidators) {
     const fieldValidators: ValidatorFuncType[] = formValidators[field];
 
-    for (let i = 0; i < fieldValidators.length; i++) {
+    for (let i = 0; i < fieldValidators?.length; i++) {
       const validate: ValidatorFuncType = fieldValidators[i];
       const processValue = value !== null ? value : form[field];
       let result = validate(processValue);
