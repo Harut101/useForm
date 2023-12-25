@@ -18,7 +18,7 @@ module.exports = {
     libraryTarget: "commonjs2",
   },
   resolve: {
-    extensions: [".ts", ".js"],
+    extensions: [".ts"],
     alias: {
       "@hook": path.resolve(__dirname, `${PATHS.src}/hook`),
       "@types": path.resolve(__dirname, `${PATHS.src}/types`),
@@ -32,11 +32,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|ts)$/,
+        test: /\.ts$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-        },
+        use: ["babel-loader", "ts-loader"],
       },
     ],
   },
