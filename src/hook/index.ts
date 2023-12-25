@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
 import { validateForm, getField, setFieldValue, isCheckboxInput, isEmpty } from "@utils";
-import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption } from "form-manager-hook";
+import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption } from "@types";
 
 const defaultConfigOption = {
   mode: "uncontrolled",

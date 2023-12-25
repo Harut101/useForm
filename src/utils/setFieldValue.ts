@@ -1,5 +1,5 @@
 import { isCheckboxInput, isRadioInput, isSelect } from "@utils";
-import { FieldElement, FieldValueType } from "form-manager-hook";
+import { FieldElement, FieldValueType } from "@types";
 
 export const setFieldValue = (field: FieldElement, value: FieldValueType) => {
   if (isCheckboxInput(field) || isRadioInput(field)) {

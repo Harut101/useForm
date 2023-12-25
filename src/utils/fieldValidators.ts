@@ -1,5 +1,4 @@
-import { FieldValueType, TestValidatorFuncType, ValidatedResultType } from "form-manager-hook";
-
+import { FieldValueType, TestValidatorFuncType, ValidatedResultType } from "@types";
 
 function isString(str: FieldValueType): str is string {
   return typeof str === "string";

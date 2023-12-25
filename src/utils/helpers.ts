@@ -1,4 +1,4 @@
-import { FieldValueType, Errors } from "form-manager-hook";
+import { FieldValueType, Errors } from "@types";
 
 export const isUndefined = (val: FieldValueType): val is undefined => val === undefined;
 
