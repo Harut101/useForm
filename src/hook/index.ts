@@ -1,9 +1,21 @@
 import { useEffect, useState, useCallback, useRef, SyntheticEvent, ChangeEvent } from "react";
 import { validateForm, getField, setFieldValue, isCheckboxInput, isEmpty } from "@utils";
-import { FieldValueType, FieldName, Errors, Schema, SubmitHandlerType, FieldElement, ConfigOption } from "@types";
+import {
+  FieldValueType,
+  FieldName,
+  Errors,
+  Schema,
+  SubmitHandlerType,
+  FieldElement,
+  ConfigOption,
+  SetValueOption,
+  FormModeEnum,
+  SetValueModeEnum,
+  Mode,
+} from "@types";
 
 const defaultConfigOption = {
-  mode: "uncontrolled",
+  mode: FormModeEnum.uncontrolled,
   updateBackupForm: false,
 };
 
@@ -16,7 +28,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
   const form = useRef({ ...schema.fields });
   const timer = useRef<NodeJS.Timeout | null>(null);
 
-  const option = { ...defaultConfigOption, ...configOption };
+  const config = { ...defaultConfigOption, ...configOption };
 
   useEffect(() => {
     return () => {
@@ -26,7 +38,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
 
   const validate = useCallback(
     (name: FieldName, value: FieldValueType) => {
-      const formToValidate = option.mode === "controlled" ? controlledForm : form.current;
+      const formToValidate = config.mode === FormModeEnum.controlled ? controlledForm : form.current;
       const validated = validateForm(formToValidate, { [name]: schema.validators[name] }, value);
 
       setErrors((errors) => {
@@ -37,7 +49,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
         return { ...errorClone, ...validated };
       });
     },
-    [schema.validators, controlledForm, option]
+    [schema.validators, controlledForm, config]
   );
 
   const onSubmit = useCallback(
@@ -46,7 +58,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
 
       setSubmitted(true);
 
-      const formToValidate = option.mode === "controlled" ? controlledForm : form.current;
+      const formToValidate = config.mode === FormModeEnum.controlled ? controlledForm : form.current;
 
       const errors = validateForm(formToValidate, schema.validators);
 
@@ -57,14 +69,14 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
 
         timer.current = setTimeout(() => setIsDraft(false), 300);
 
-        if (option.updateBackupForm) backUpForm.current = formToValidate;
+        if (config.updateBackupForm) backUpForm.current = formToValidate;
       }
     },
-    [submitHandler, schema.validators, controlledForm, option]
+    [submitHandler, schema.validators, controlledForm, config]
   );
 
-  const assignValue = useCallback((name: FieldName, value: FieldValueType, mode: string) => {
-    if (mode === "controlled") {
+  const assignValue = useCallback((name: FieldName, value: FieldValueType, mode: Mode, option?: SetValueOption) => {
+    if (mode === FormModeEnum.controlled) {
       setControlledForm((prev) => ({
         ...prev,
         [name]: value,
@@ -72,52 +84,56 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
     } else {
       form.current[name] = value;
     }
-    setIsDraft(true);
+
+    if (!option || option?.mode !== SetValueModeEnum.silent) setIsDraft(true);
   }, []);
 
   const handleChange = useCallback(
     (name: FieldName, value: FieldValueType) => {
       if (submitted) validate(name, value);
 
-      assignValue(name, value, option.mode);
+      assignValue(name, value, config.mode);
     },
-    [submitted, schema.validators, option, assignValue, validate]
+    [submitted, schema.validators, config, assignValue, validate]
   );
 
   const setValue = useCallback(
-    (name: FieldName, value: FieldValueType) => {
+    (name: FieldName, value: FieldValueType, option?: SetValueOption) => {
       if (submitted) validate(name, value);
 
-      assignValue(name, value, option.mode);
+      assignValue(name, value, config.mode, option);
     },
-    [submitted, option, assignValue, validate]
+    [submitted, config, assignValue, validate]
   );
 
-  const getValue = useCallback((name: FieldName) => (option.mode === "controlled" ? controlledForm[name] : form.current[name]), [option]);
+  const getValue = useCallback(
+    (name: FieldName) => (config.mode === FormModeEnum.controlled ? controlledForm[name] : form.current[name]),
+    [config]
+  );
 
   const setError = useCallback((name: FieldName, message: string) => setErrors({ ...errors, [name]: message }), [errors]);
 
   const reset = useCallback(
     (name = null) => {
-      const { mode } = option;
+      const { mode } = config;
 
       setIsDraft(false);
 
       if (name) {
-        if (mode === "controlled") {
+        if (mode === FormModeEnum.controlled) {
           setControlledForm((prev) => ({ ...prev, [name]: backUpForm.current[name] }));
         } else {
           form.current[name] = backUpForm.current[name];
         }
       } else {
-        if (mode === "controlled") {
+        if (mode === FormModeEnum.controlled) {
           setControlledForm({ ...backUpForm.current });
         } else {
           form.current = { ...backUpForm.current };
         }
       }
     },
-    [option]
+    [config]
   );
 
   const register = useCallback(
@@ -127,7 +143,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
         ref: (_ref: FieldElement) => {
           const field = getField(_ref) as FieldElement;
 
-          if (field && option.mode === "uncontrolled") {
+          if (field && config.mode === FormModeEnum.uncontrolled) {
             setFieldValue(field, form.current[name]);
           }
         },
@@ -144,7 +160,7 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
 
       return fieldObj;
     },
-    [option, handleChange]
+    [config, handleChange]
   );
 
   return {

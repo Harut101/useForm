@@ -9,7 +9,23 @@ export type SubmitHandlerType = (form: Form) => void;
 export type TestValidatorFuncType = (value: FieldValueType) => boolean;
 export type StateType = "value" | "checked";
 
+export enum FormModeEnum {
+  controlled = "controlled",
+  uncontrolled = "uncontrolled",
+}
+
+export enum SetValueModeEnum {
+  silent = "silent",
+  normal = "normal",
+}
+
 export type Mode = "controlled" | "uncontrolled";
+
+export type SetValueMode = "silent" | "normal";
+
+export interface SetValueOption {
+  mode?: SetValueMode;
+}
 
 export interface ConfigOption {
   mode?: Mode;

@@ -8,6 +8,7 @@ const PATHS = {
 module.exports = {
   externals: {
     paths: PATHS,
+    react: "commonjs react",
   },
   entry: {
     main: [`${PATHS.src}`],
@@ -26,9 +27,6 @@ module.exports = {
     },
   },
   plugins: [new CleanWebpackPlugin()],
-  externals: {
-    react: "commonjs react",
-  },
   module: {
     rules: [
       {
