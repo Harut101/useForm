@@ -81,6 +81,10 @@ In this example, you define your form schema and validation rules, initialize th
 `onSubmit`: A function to handle form submission, including validation.
 
 `setValue`: A function to set the value of a form field programmatically.
+    - `Parameters`:
+        - `name`: The name of the field to update.
+        - `value`: The new value to set for the field.
+        - `option` (optional): An object providing additional options for the value assignment, such as controlling the assignment mode (silent or normal). If the mode is set to silent, the draft state is not set to true.
 
 `getValue`: A function to retrieve the current value of a form field.
 
