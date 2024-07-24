@@ -102,6 +102,19 @@ In this example, you define your form schema and validation rules, initialize th
 
   - After submitting the form successfully (assuming there are no validation errors), `isDraft` is set back to `false`. You can use this state to prompt the user to save changes before leaving the page or to provide visual feedback about the form's current state.
 
+`getChangedFields`: A function that returns an object containing the fields that have changed from their initial values. 
+
+  The object format is:
+  ```json
+    {
+      "fieldName": {
+        "from": "initialValue",
+        "to": "currentValue"
+      }
+    }
+  ```
+  This allows you to track which fields have been modified by the user and what their original and current values are.
+
 # Validator Functions
 
 `number`:

@@ -22,7 +22,7 @@ const defaultConfigOption = {
 export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, configOption: ConfigOption = {}) => {
   const backUpForm = useRef({ ...schema.fields });
   const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Errors>({});
   const [isDraft, setIsDraft] = useState(false);
   const [controlledForm, setControlledForm] = useState({ ...schema.fields });
   const form = useRef({ ...schema.fields });
@@ -163,6 +163,26 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
     [config, handleChange]
   );
 
+  const getChangedFields = useCallback(() => {
+    const formValues = config.mode === FormModeEnum.controlled ? controlledForm : form.current;
+    const changedFields: Partial<Record<FieldName, { from: FieldValueType; to: FieldValueType }>> = {};
+
+    for (const key in formValues) {
+      if (formValues.hasOwnProperty(key)) {
+        const currentValue = formValues[key];
+        const initialValue = backUpForm.current[key];
+        if (currentValue !== initialValue) {
+          changedFields[key] = {
+            from: initialValue,
+            to: currentValue,
+          };
+        }
+      }
+    }
+
+    return changedFields;
+  }, [config.mode, controlledForm]);
+
   return {
     form: controlledForm,
     errors,
@@ -174,5 +194,6 @@ export const useForm = (schema: Schema, submitHandler: SubmitHandlerType, config
     getValue,
     setError,
     reset,
+    getChangedFields,
   };
 };
